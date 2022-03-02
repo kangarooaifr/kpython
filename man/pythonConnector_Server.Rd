@@ -4,7 +4,12 @@
 \alias{pythonConnector_Server}
 \title{Title Python Connector Server}
 \usage{
-pythonConnector_Server(id, script_path, script_file = NULL)
+pythonConnector_Server(
+  id,
+  script_path,
+  script_file = NULL,
+  dependencies = NULL
+)
 }
 \arguments{
 \item{file}{}
