@@ -44,7 +44,6 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
       # *********************** DEBUG ***************************************
       str(PYTHON_DEPENDENCIES)
 
-
     }
 
     # -- Get environment variables
