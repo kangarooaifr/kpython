@@ -37,18 +37,20 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     if(!is.null(dependencies)){
 
       target_file <- file.path(dependencies, "python_requirements.txt")
-      cat("[PYTHON] Reading python_requirements file :", target_file, "\n")
+      cat("[PYTHON] Reading python_requirements file:", target_file, "\n")
       PYTHON_DEPENDENCIES <- readLines(con <- file(target_file, encoding = "UTF-8"))
       close(con)
 
-      # *********************** DEBUG ***************************************
-      str(PYTHON_DEPENDENCIES)
+      cat("[PYTHON] Requirements:", PYTHON_DEPENDENCIES, "\n")
 
     }
 
     # -- Get environment variables
     virtualenv_dir <- Sys.getenv('VIRTUALENV_NAME')
+    cat("[PYTHON] VIRTUALENV_NAME:", virtualenv_dir, "\n")
+
     python_path <- Sys.getenv('PYTHON_PATH')
+    cat("[PYTHON] PYTHON_PATH:", python_path, "\n")
 
 
     # ----------------------------------------------------------------------------
@@ -59,18 +61,23 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     if (Sys.info()[['user']] %in% c('shiny', 'rstudio-connect')){
 
       # -- Running on Remote Server
+      cat("[PYTHON] Running on Remote Server [user] =", Sys.info()[['user']], "\n")
+
       # Create virtual env and install dependencies
       cat("[PYTHON] Create virtual environment :", virtualenv_dir, "\n")
       reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
+
       cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
       reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
+
       reticulate::use_virtualenv(virtualenv_dir, required = T)
-      cat("[PYTHON] Environment ready!", PYTHON_DEPENDENCIES, "\n")
+      cat("[PYTHON] Environment ready!", virtualenv_dir, "\n")
 
     } else {
 
       # -- Running locally
-      cat("Running on local machine [user] =", Sys.info()[['user']], "\n")
+      cat("[PYTHON] Running on local machine [user] =", Sys.info()[['user']], "\n")
+      cat("[PYTHON] Working with condaenv =", virtualenv_dir, "\n")
 
       # Setup anaconda env
       use_condaenv(condaenv = virtualenv_dir, conda = "auto", required = FALSE)
@@ -83,7 +90,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     # ----------------------------------------------------------------------------
 
     # log
-    cat("Python function import into: ")
+    cat("[PYTHON] Function import into: ")
     str(globalenv())
 
     # source script
@@ -93,7 +100,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
 
     } else {
 
-      cat("   Loading python script from: ", script_path, "\n")
+      cat("[PYTHON] Loading python script from: ", script_path, "\n")
       for (nm in list.files(script_path, full.names = TRUE, recursive = TRUE, include.dirs = FALSE))
       {
         # Evaluate and convert Python script
