@@ -12,10 +12,13 @@ pythonConnector_Server(
 )
 }
 \arguments{
-\item{file}{}
-}
-\value{
+\item{id}{server module id}
 
+\item{script_path}{path to the python script files}
+
+\item{script_file}{if provided, only this list of scripts will be loaded}
+
+\item{dependencies}{path where to find the python_requirements.txt file containing the package dependencies for installation}
 }
 \description{
 Python connector implementation through Reticulate package.

@@ -2,14 +2,14 @@
 # ------------------------------------------------------------------------------
 #' Title Python Connector Server
 #'
-#' @param id
-#' @param script_path
-#' @param file
+#' @param id server module id
+#' @param script_path path to the python script files
+#' @param script_file if provided, only this list of scripts will be loaded
+#' @param dependencies path where to find the python_requirements.txt file containing the package dependencies for installation
 #'
 #' @description Python connector implementation through Reticulate package.
 #' configure Python virtualenv and paths in .Rprofile file.
 #'
-#' @return
 #' @export pythonConnector_Server
 #' @import shiny reticulate
 #'
@@ -97,7 +97,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
 
     # log
     cat("[PYTHON] Function import into: ")
-    str(globalenv())
+    utils::str(globalenv())
 
     # source script
     if(!is.null(script_file)){
@@ -126,7 +126,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
       s = Sys.info()
       df = data.frame(Info_Field = names(s),
                       Current_System_Setting = as.character(s))
-      return(datatable(df, rownames = F, selection = 'none',
+      return(DT::datatable(df, rownames = F, selection = 'none',
                        style = 'bootstrap', filter = 'none', options = list(dom = 't')))
     })
 
