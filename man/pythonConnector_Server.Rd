@@ -8,7 +8,8 @@ pythonConnector_Server(
   id,
   script_path,
   script_file = NULL,
-  dependencies = NULL
+  dependencies = NULL,
+  skip_init = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ pythonConnector_Server(
 \item{script_file}{if provided, only this list of scripts will be loaded}
 
 \item{dependencies}{path where to find the python_requirements.txt file containing the package dependencies for installation}
+
+\item{skip_init}{logical, if TRUE python initialization will be skiped}
 }
 \description{
 Python connector implementation through Reticulate package.

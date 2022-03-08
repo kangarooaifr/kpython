@@ -6,6 +6,7 @@
 #' @param script_path path to the python script files
 #' @param script_file if provided, only this list of scripts will be loaded
 #' @param dependencies path where to find the python_requirements.txt file containing the package dependencies for installation
+#' @param skip_init logical, if TRUE python initialization will be skiped
 #'
 #' @description Python connector implementation through Reticulate package.
 #' configure Python virtualenv and paths in .Rprofile file.
@@ -20,7 +21,7 @@
 # SERVER LOGIC
 # ------------------------------------------------------------------------------
 
-pythonConnector_Server <- function(id, script_path, script_file = NULL, dependencies = NULL) {
+pythonConnector_Server <- function(id, script_path, script_file = NULL, dependencies = NULL, skip_init = FALSE) {
   moduleServer(id, function(input, output, session) {
 
     # -- Get namespace
@@ -30,63 +31,73 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     # -- check path
     if(!dir.exists(script_path)) stop('Python script path does not exist! \n')
 
-    # -- check if python already initialized
-    if(py_available()){
+    # -- check skip argument
+    if(skip_init){
 
-      cat("   [WARNING] Python is already initialized! \n", Sys.which('python'), "\n")
+      cat("   [WARNING] skip_init == TRUE, no python init will be done! \n")
+      cat("   [PYTHON] Which python =", Sys.which('python'), "\n")
 
     } else {
 
-      # -- Python packages needed for the app:
-      PYTHON_DEPENDENCIES <- NULL
-      if(!is.null(dependencies)){
+      # -- check if already initialized
+      if(py_available()){
 
-        target_file <- file.path(dependencies, "python_requirements.txt")
-        cat("[PYTHON] Reading python_requirements file:", target_file, "\n")
-        PYTHON_DEPENDENCIES <- readLines(con <- file(target_file, encoding = "UTF-8"))
-        close(con)
-
-        cat("[PYTHON] Requirements:", PYTHON_DEPENDENCIES, "\n")
-
-      }
-
-      # -- Get environment variables
-      virtualenv_dir <- Sys.getenv('VIRTUALENV_NAME')
-      cat("[PYTHON] VIRTUALENV_NAME:", virtualenv_dir, "\n")
-
-      python_path <- Sys.getenv('PYTHON_PATH')
-      cat("[PYTHON] PYTHON_PATH:", python_path, "\n")
-
-
-      # ----------------------------------------------------------------------------
-      # Python environments setup
-      # ----------------------------------------------------------------------------
-
-      # check user
-      if (Sys.info()[['user']] %in% c('shiny', 'rstudio-connect')){
-
-        # -- Running on Remote Server
-        cat("[PYTHON] Running on Remote Server [user] =", Sys.info()[['user']], "\n")
-
-        # Create virtual env and install dependencies
-        cat("[PYTHON] Create virtual environment :", virtualenv_dir, "\n")
-        reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
-
-        cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
-        reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
-
-        reticulate::use_virtualenv(virtualenv_dir, required = T)
-        cat("[PYTHON] Environment ready!", virtualenv_dir, "\n")
+        cat("   [WARNING] Python is already initialized! \n")
+        cat("   [PYTHON] Which python =", Sys.which('python'), "\n")
 
       } else {
 
-        # -- Running locally
-        cat("[PYTHON] Running on local machine [user] =", Sys.info()[['user']], "\n")
-        cat("[PYTHON] Working with condaenv =", virtualenv_dir, "\n")
+        # -- Python packages needed for the app:
+        PYTHON_DEPENDENCIES <- NULL
+        if(!is.null(dependencies)){
 
-        # Setup anaconda env
-        use_condaenv(condaenv = virtualenv_dir, conda = "auto", required = FALSE)
+          target_file <- file.path(dependencies, "python_requirements.txt")
+          cat("[PYTHON] Reading python_requirements file:", target_file, "\n")
+          PYTHON_DEPENDENCIES <- readLines(con <- file(target_file, encoding = "UTF-8"))
+          close(con)
 
+          cat("[PYTHON] Requirements:", PYTHON_DEPENDENCIES, "\n")
+
+        }
+
+        # -- Get environment variables
+        virtualenv_dir <- Sys.getenv('VIRTUALENV_NAME')
+        cat("[PYTHON] VIRTUALENV_NAME:", virtualenv_dir, "\n")
+
+        python_path <- Sys.getenv('PYTHON_PATH')
+        cat("[PYTHON] PYTHON_PATH:", python_path, "\n")
+
+
+        # ----------------------------------------------------------------------------
+        # Python environments setup
+        # ----------------------------------------------------------------------------
+
+        # check user
+        if (Sys.info()[['user']] %in% c('shiny', 'rstudio-connect')){
+
+          # -- Running on Remote Server
+          cat("[PYTHON] Running on Remote Server [user] =", Sys.info()[['user']], "\n")
+
+          # Create virtual env and install dependencies
+          cat("[PYTHON] Create virtual environment :", virtualenv_dir, "\n")
+          reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
+
+          cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
+          reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
+
+          reticulate::use_virtualenv(virtualenv_dir, required = T)
+          cat("[PYTHON] Environment ready!", virtualenv_dir, "\n")
+
+        } else {
+
+          # -- Running locally
+          cat("[PYTHON] Running on local machine [user] =", Sys.info()[['user']], "\n")
+          cat("[PYTHON] Working with condaenv =", virtualenv_dir, "\n")
+
+          # Setup anaconda env
+          use_condaenv(condaenv = virtualenv_dir, conda = "auto", required = FALSE)
+
+        }
       }
     }
 
@@ -127,7 +138,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
       df = data.frame(Info_Field = names(s),
                       Current_System_Setting = as.character(s))
       return(DT::datatable(df, rownames = F, selection = 'none',
-                       style = 'bootstrap', filter = 'none', options = list(dom = 't')))
+                           style = 'bootstrap', filter = 'none', options = list(dom = 't')))
     })
 
     # System path to python
