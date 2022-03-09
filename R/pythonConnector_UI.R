@@ -17,7 +17,7 @@ which_python_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(verbatimTextOutput(ns('which_python')))
+  withSpinner(verbatimTextOutput(ns('which_python')), proxy.height = "30px")
 
 }
 
@@ -39,7 +39,7 @@ python_version_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(verbatimTextOutput(ns('python_version')))
+  withSpinner(verbatimTextOutput(ns('python_version')), proxy.height = "30px")
 
 }
 
@@ -62,7 +62,7 @@ sysinfo_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(DT::dataTableOutput(ns("sysinfo")))
+  withSpinner(DT::dataTableOutput(ns("sysinfo")), proxy.height = "30px")
 
 }
 
