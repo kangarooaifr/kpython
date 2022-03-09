@@ -6,7 +6,6 @@
 #'
 #' @return a text output with path to the active python.
 #' @export which_python_UI
-#' @import shinycssloaders
 #'
 #' @examples which_python_UI("python")
 
@@ -17,7 +16,7 @@ which_python_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(verbatimTextOutput(ns('which_python')), proxy.height = "30px")
+  verbatimTextOutput(ns('which_python'))
 
 }
 
@@ -39,7 +38,7 @@ python_version_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(verbatimTextOutput(ns('python_version')), proxy.height = "30px")
+  verbatimTextOutput(ns('python_version'))
 
 }
 
@@ -62,7 +61,7 @@ sysinfo_UI <- function(id){
   ns <- NS(id)
 
   # build output
-  withSpinner(DT::dataTableOutput(ns("sysinfo")), proxy.height = "30px")
+  DT::dataTableOutput(ns("sysinfo"))
 
 }
 
