@@ -28,14 +28,32 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     ns <- session$ns
     cat("[PYTHON] Starting Python Connector Server... \n")
 
-    # -- check path
+    # -- check Python script path
     if(!dir.exists(script_path)) stop('Python script path does not exist! \n')
+
+    # -- Read Python packages needed for the app:
+    if(!is.null(dependencies)){
+
+      target_file <- file.path(dependencies, "python_requirements.txt")
+      cat("[PYTHON] Reading python_requirements file:", target_file, "\n")
+      PYTHON_DEPENDENCIES <- readLines(con <- file(target_file, encoding = "UTF-8"))
+      close(con)
+
+      cat("[PYTHON] Requirements:", PYTHON_DEPENDENCIES, "\n")
+
+    } else PYTHON_DEPENDENCIES <- NULL
+
 
     # -- check skip argument
     if(skip_init){
 
-      cat("   [WARNING] skip_init == TRUE, no python init will be done! \n")
+      cat("   [WARNING] skip_init == TRUE, no python env init will be done! \n")
       cat("   [PYTHON] Which python =", Sys.which('python'), "\n")
+
+      # Install python package
+      if(!is.null(PYTHON_DEPENDENCIES)){
+        cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
+        reticulate::py_install(packages = PYTHON_DEPENDENCIES, method = "auto")}
 
     } else {
 
@@ -46,19 +64,6 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
         cat("   [PYTHON] Which python =", Sys.which('python'), "\n")
 
       } else {
-
-        # -- Python packages needed for the app:
-        PYTHON_DEPENDENCIES <- NULL
-        if(!is.null(dependencies)){
-
-          target_file <- file.path(dependencies, "python_requirements.txt")
-          cat("[PYTHON] Reading python_requirements file:", target_file, "\n")
-          PYTHON_DEPENDENCIES <- readLines(con <- file(target_file, encoding = "UTF-8"))
-          close(con)
-
-          cat("[PYTHON] Requirements:", PYTHON_DEPENDENCIES, "\n")
-
-        }
 
         # -- Get environment variables
         virtualenv_dir <- Sys.getenv('VIRTUALENV_NAME')
@@ -82,9 +87,12 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
           cat("[PYTHON] Create virtual environment :", virtualenv_dir, "\n")
           reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
 
-          cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
-          reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
+          # Install python package
+          if(!is.null(PYTHON_DEPENDENCIES)){
+            cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
+            reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)}
 
+          # Set use env
           reticulate::use_virtualenv(virtualenv_dir, required = T)
           cat("[PYTHON] Environment ready!", virtualenv_dir, "\n")
 
@@ -95,7 +103,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
           cat("[PYTHON] Working with condaenv =", virtualenv_dir, "\n")
 
           # Setup anaconda env
-          use_condaenv(condaenv = virtualenv_dir, conda = "auto", required = FALSE)
+          reticulate::use_condaenv(condaenv = virtualenv_dir, conda = "auto", required = FALSE)
 
         }
       }
@@ -113,7 +121,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
     # source script
     if(!is.null(script_file)){
 
-      source_python(script_file, envir = globalenv())
+      reticulate::source_python(script_file, envir = globalenv())
 
     } else {
 
@@ -121,7 +129,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
       for (nm in list.files(script_path, full.names = TRUE, recursive = TRUE, include.dirs = FALSE))
       {
         # Evaluate and convert Python script
-        source_python(nm, envir = globalenv())
+        reticulate::source_python(nm, envir = globalenv())
 
       }
 
