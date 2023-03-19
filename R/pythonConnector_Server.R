@@ -53,7 +53,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
       # Install python package
       if(!is.null(PYTHON_DEPENDENCIES)){
         cat("[PYTHON] Install dependencies :", PYTHON_DEPENDENCIES, "\n")
-        reticulate::py_install(packages = PYTHON_DEPENDENCIES, method = "auto")}
+        reticulate::py_install(packages = PYTHON_DEPENDENCIES, envname = "r-reticulate", method = "auto")}
 
     } else {
 
@@ -156,7 +156,7 @@ pythonConnector_Server <- function(id, script_path, script_file = NULL, dependen
 
     # Python version
     output$python_version <- renderText({
-      rr = reticulate::py_discover_config(use_environment = 'python35_env')
+      rr = reticulate::py_discover_config()
       paste0('Python version: ', rr$version)
     })
 
