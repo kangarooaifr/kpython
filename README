@@ -1,37 +1,10 @@
----
-title: "README"
-output: html_document
----
+# kpython
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-## R Package
+## Description
 
-This repository contains a R Package.
 It provides R Shiny module UI/Server functions to build Python connector from your app.
 
 ## Package Installation
 
-1. Devtools
-
-In order to publish on Shinyapp.io, it's needed to install this package using devtools::install_github()
-Install and load devtools package:
-
-```{r cars}
-install.packages("devtools")
-library(devtools)
-```
-
-2. Install package
-
-In most cases, you just use install_github("author/package").
-For example, with myPackage package, which exists at github.com/myaccount/myPackage, you’d type:
-
-```{r cars}
-install_github("myaccount/myPackage")
-```
-
-
-    
+install_github("thekangaroofactory/kpython")

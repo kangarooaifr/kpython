@@ -2,9 +2,8 @@ Package: kpython
 Title: R Shiny Python Connector
 Version: 0.0.0.9004
 Authors@R: 
-    person("kangaroo", "ai", , "kangaroo.ai@kangaroo-ai.fr", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Provides R/Python connector using Reticulate package. Shiny UI / Server module architecture.
+    person("philippe", "peret", , "philippe.peret@hotmail.com", role = c("aut", "cre"))
+Description: Provides R / Python connector using Reticulate package. Shiny UI / Server module architecture.
 Imports:
     shiny,
     reticulate,
